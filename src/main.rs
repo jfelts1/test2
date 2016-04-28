@@ -8,11 +8,18 @@ fn main(){
     tuples();
     control_flow();
     structs();
+    matches();
 }
 
 struct Point {
     x:f32,
     y:f32,
+}
+
+enum Mess{
+    One,
+    Two,
+    Three,
 }
 
 fn var_bindings(){
@@ -156,6 +163,39 @@ fn structs(){
     println!("structs end");
 }
 
+fn matches(){
+    //match
+    println!("\nmatches begin");
+    let x = 5;
+    match x{
+        1=>println!("1"),
+        2=>println!("2"),
+        3=>println!("3"),
+        4=>println!("4"),
+        5=>println!("5"),
+        _=>println!("other"),
+    }
+    //can assign the return value from matches to varables
+    let num = match x{
+        1=>"one",
+        2=>"two",
+        3=>"three",
+        4=>"four",
+        5=>"five",
+        _=>"other",
+    };
+    println!("{}",num);
+
+    let mut m = Mess::One;
+    take_mess(m);
+    m = Mess::Two;
+    take_mess(m);
+    m = Mess::Three;
+    take_mess(m);
+
+    println!("matches end");
+}
+
 fn foo(x:i32){
     println!("foo got: {}",x);
 }
@@ -174,4 +214,13 @@ fn sum(x:i32, y:i32)->i32{
 
 fn fma(x:f32, y:f32, z:f32)->f32{
     x+(y*z)
+}
+
+fn take_mess(m:Mess){
+    //match works on enums
+    match m{
+        Mess::One=>println!("One"),
+        Mess::Two=>println!("Two"),
+        Mess::Three=>println!("Three"),
+    };
 }
