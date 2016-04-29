@@ -9,6 +9,8 @@ fn main(){
     control_flow();
     structs();
     matches();
+    patterns();
+
 }
 
 struct Point {
@@ -20,6 +22,11 @@ enum Mess{
     One,
     Two,
     Three,
+}
+
+enum OptionalInt{
+    Value(i32),
+    Missing
 }
 
 fn var_bindings(){
@@ -194,6 +201,92 @@ fn matches(){
     take_mess(m);
 
     println!("matches end");
+}
+
+fn patterns(){
+    //patterns
+    println!("\npatterns start");
+    //multiple patterns matched
+    let mut x = 1;
+    println!("x is {}",x);
+    match x{
+        1|2=>println!("one or two"),
+        3=>println!("three"),
+        _=>println!("not 1,2,or 3"),
+    }
+    x=2;
+    println!("x is {}",x);
+    match x{
+        1|2=>println!("one or two"),
+        3=>println!("three"),
+        _=>println!("not 1,2,or 3"),
+    }
+    x=3;
+    println!("x is {}",x);
+    match x{
+        1|2=>println!("one or two"),
+        3=>println!("three"),
+        _=>println!("not 1,2,or 3"),
+    }
+    x=4;
+    println!("x is {}",x);
+    match x{
+        1|2=>println!("one or two"),
+        3=>println!("three"),
+        _=>println!("not 1,2,or 3"),
+    }
+
+    let p = Point{x:1.0,y:2.0};
+    match p{
+        Point {x,y}=>println!("p:({},{})",x,y),
+    }
+
+    //match a range of values with ...
+    let t = 1;
+    match t{
+        1 ... 5=>println!("valid value"),
+        _ => println!("invalid value"),
+    }
+
+    //can do this with chars
+    let c = 'f';
+    match c{
+        'a'...'j'=>println!("a through j"),
+        'k'...'z'=>println!("k through z"),
+        _=>println!("something else"),
+    }
+
+    //can bind ranges to names to get the exact value matched
+    let o = 2;
+    match o{
+        v@1...5=>println!("value is {}",v),
+        _=>println!("other value"),
+    }
+
+    //can introduce guards by including an if expression
+    let mut oi = OptionalInt::Value(5);
+    println!("oi is 5");
+    match oi{
+        OptionalInt::Value(i) if i >5=>println!("value is bigger than 5"),
+        OptionalInt::Value(..)=>println!("got and int"),
+        OptionalInt::Missing =>println!("didn't get an int"),
+    }
+    oi = OptionalInt::Value(6);
+    println!("oi is now 6");
+    match oi{
+        OptionalInt::Value(i) if i >5=>println!("value is bigger than 5"),
+        OptionalInt::Value(..)=>println!("got and int"),
+        OptionalInt::Missing =>println!("didn't get an int"),
+    }
+    oi = OptionalInt::Missing;
+    println!("oi is now missing");
+    match oi{
+        OptionalInt::Value(i) if i >5=>println!("value is bigger than 5"),
+        OptionalInt::Value(..)=>println!("got and int"),
+        OptionalInt::Missing =>println!("didn't get an int"),
+    }
+
+    println!("patterns end");
 }
 
 fn foo(x:i32){
