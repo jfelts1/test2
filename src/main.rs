@@ -10,12 +10,124 @@ fn main(){
     structs();
     matches();
     patterns();
-
+    method_calls();
+    vectors();
+    traits();
 }
 
 struct Point {
     x:f32,
     y:f32,
+}
+
+struct Circle{
+    x:f64,
+    y:f64,
+    radius:f64,
+}
+
+struct Square{
+    side:f64,
+}
+
+//drop
+struct Firework{
+    strength:i32,
+}
+//drop
+impl Drop for Firework{
+    fn drop(&mut self){
+        println!("BOOM times {}!!!",self.strength);
+    }
+}
+
+impl Firework{
+    fn light_firework(&self){
+        println!("firework has been light!");
+    }
+}
+
+//traits on generic structs
+#[derive(Debug)]
+struct Rectangle<T>{
+    x:T,
+    y:T,
+    w:T,
+    h:T,
+}
+//traits on generic structs
+impl<T:PartialEq> Rectangle<T>{
+    fn is_square(&self)->bool{
+        self.w == self.h
+    }
+}
+
+trait HasArea{
+    fn area(&self)->f64;
+}
+
+impl HasArea for Circle{
+    fn area(&self)->f64{
+        std::f64::consts::PI*(self.radius*self.radius)
+    }
+}
+
+impl HasArea for Square{
+    fn area(&self)->f64{
+        self.side * self.side
+    }
+}
+
+//defining methods
+impl Circle{
+
+    //Associated function
+    //note how it doesn't take a self parameter
+    fn new(x:f64,y:f64,radius:f64)->Circle{
+        Circle{
+            x:x,
+            y:y,
+            radius:radius,
+        }
+    }
+
+    fn grow(&self,increment:f64)->Circle{
+        Circle{x:self.x,y:self.y,radius:self.radius + increment}
+    }
+}
+
+//Builder Pattern
+//allows for default values
+struct CircleBuilder{
+    x:f64,
+    y:f64,
+    radius:f64,
+}
+//Builder Pattern
+//allows for default values
+impl CircleBuilder{
+    fn new()->CircleBuilder{
+        CircleBuilder{x:0.0,y:0.0,radius:1.0,}
+    }
+
+    fn x(&mut self, coordinate:f64)->&mut CircleBuilder{
+        self.x = coordinate;
+        self
+    }
+
+    fn y(&mut self, coordinate:f64)->&mut CircleBuilder{
+        self.y = coordinate;
+        self
+    }
+
+    fn radius(&mut self, coordinate:f64)->&mut CircleBuilder{
+        self.radius = coordinate;
+        self
+    }
+
+    fn finalize(&self)->Circle{
+        Circle{x:self.x,y:self.y,radius:self.radius}
+    }
 }
 
 enum Mess{
@@ -182,7 +294,7 @@ fn matches(){
         5=>println!("5"),
         _=>println!("other"),
     }
-    //can assign the return value from matches to varables
+    //can assign the return value from matches to variables
     let num = match x{
         1=>"one",
         2=>"two",
@@ -289,6 +401,76 @@ fn patterns(){
     println!("patterns end");
 }
 
+fn method_calls(){
+    println!("\nmethod_calls begin");
+    //method calls
+    let c = Circle{x:0.0,y:0.0,radius:2.0};
+    println!("pos:({},{}), area:{}",c.x,c.y,c.area());
+    //chaining method calls
+    println!("pos:({},{}), area:{}",c.x,c.y,c.grow(2.0).area());
+    //note since the grow method returned a new Circle c isn't changed
+    println!("pos:({},{}), area:{}",c.x,c.y,c.area());
+    let c2 = Circle::new(0.0,0.0,3.0);
+    println!("pos:({},{}), area:{}",c2.x,c2.y,c2.area());
+    //Builder pattern allows for default values
+    let c3 = CircleBuilder::new().x(2.0).y(1.0).finalize();
+    //radius defaults to 1.0
+    println!("pos:({},{}), area:{}",c3.x,c3.y,c3.area());
+    let c4 = CircleBuilder::new().radius(5.0).finalize();
+    //defaults to x = 0 y = 0
+    println!("pos:({},{}), area:{}",c4.x,c4.y,c4.area());
+    println!("method_calls end");
+}
+
+fn vectors(){
+    println!("\nvectors begin");
+    //vectors
+    let mut v = vec![1,2,3,4,5];
+    println!("The third element of v is {}",v[2]);
+    //iterating over vectors
+    for i in &v{
+        println!("A reference to {}",i);
+    }
+    v.pop();
+    for i in &mut v {
+        println!("A mutable reference to {}", i);
+    }
+    v.push(6);
+    for i in v {
+        println!("Take ownership of the vector and its element {}", i);
+    }
+
+    println!("vectors end");
+}
+
+fn traits(){
+    println!("\ntraits begin");
+    let c = Circle{x:0.0,y:0.0,radius:2.0};
+    print_area(c);
+    let s = Square{side:2.0};
+    print_area(s);
+
+    let mut r = Rectangle{
+        x:0,
+        y:0,
+        w:5,
+        h:5,
+    };
+
+    println!("rectangle at ({},{}) is square? {}",r.x,r.y,r.is_square());
+    r.h = 7;
+    println!("r.h is now {}",r.h);
+    //{:?} uses the debug format
+    println!("{:?} is square? {}",r,r.is_square());
+
+    //note that the drop happens when tnt leaves scope
+    {
+        let tnt = Firework { strength: 100 };
+        tnt.light_firework();
+    }
+    println!("traits end");
+}
+
 fn foo(x:i32){
     println!("foo got: {}",x);
 }
@@ -316,4 +498,9 @@ fn take_mess(m:Mess){
         Mess::Two=>println!("Two"),
         Mess::Three=>println!("Three"),
     };
+}
+
+//because T requires the trait HasArea shape is guaranteed to have the function area
+fn print_area<T:HasArea>(shape:T){
+    println!("The area of the shape is {}",shape.area());
 }
