@@ -13,6 +13,22 @@ fn main(){
     method_calls();
     vectors();
     traits();
+    println!("\nerror_handling begin");
+    let file_name = "foobar.rs";
+    println!("file:{}",file_name);
+    match find(file_name,'.'){
+        None=>println!("No file extension found."),
+        Some(i)=>println!("File Extension: {}",&file_name[i+1..]),
+    }
+
+    let file2 = "abc";
+    println!("file:{}",file2);
+    match find(file2,'.'){
+        None=>println!("No file extension found."),
+        Some(i)=>println!("File Extension: {}",&file2[i+1..]),
+    }
+
+    println!("error_handling end")
 }
 
 struct Point {
@@ -503,4 +519,13 @@ fn take_mess(m:Mess){
 //because T requires the trait HasArea shape is guaranteed to have the function area
 fn print_area<T:HasArea>(shape:T){
     println!("The area of the shape is {}",shape.area());
+}
+
+fn find(haystack: &str,needle: char)->Option<usize>{
+    for (offset,c)in haystack.char_indices(){
+        if c== needle{
+            return Some(offset);
+        }
+    }
+    None
 }
